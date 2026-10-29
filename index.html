@@ -118,6 +118,6 @@ async function route(){const p=location.hash.split('/');const pg={app:pApp,uploa
 async function load(go){const{data:{session}}=await sb.auth.getSession();S.user=session?.user||null;S.profile=null;S.admin=false;
 if(S.user){S.profile=(await sb.from('profiles').select('*').eq('id',S.user.id).maybeSingle()).data;S.admin=!!(await sb.rpc('is_admin')).data}
 if(go&&location.hash!==go)location.hash=go;else route()}
-sb.auth.onAuthStateChange(e=>{if(e=='SIGNED_IN'||e=='SIGNED_OUT')setTimeout(()=>load(),0)});
+sb.auth.onAuthStateChange((e,s)=>{if((e=='SIGNED_IN'||e=='SIGNED_OUT')&&(s?.user?.id||null)!==(S.user?.id||null))setTimeout(()=>load(),0)});
 addEventListener('hashchange',route);load();
 </script></body></html>
