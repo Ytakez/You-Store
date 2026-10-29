@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>You Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#FEF7FF;color:#1D1B20;font:16px 'Roboto Flex',Roboto,system-ui,sans-serif}
+#app{max-width:480px;margin:0 auto;padding:20px 16px 120px}
+h1{font-size:40px;font-weight:800;letter-spacing:-1px;color:#381E72;margin:0}h2{font-size:24px;font-weight:800;margin:22px 0 10px}
+a{color:inherit;text-decoration:none}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.av{width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#D0BCFF;color:#21005D;font-weight:700;font-size:20px;border-radius:50% 50% 36% 64%/56% 40% 60% 44%}
+.btn{height:48px;padding:0 22px;border:0;border-radius:24px;background:#6750A4;color:#fff;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer}
+.btn:disabled{opacity:.5}.t{background:#E8DEF8;color:#1D192B}.o{background:transparent;color:#1D1B20;border:1px solid #79747E}.big{width:100%;height:64px;border-radius:32px;font-size:18px}
+.card{display:flex;align-items:center;gap:14px;padding:14px;border-radius:32px;margin-bottom:12px}
+.ic{width:64px;height:64px;flex:none;color:#fff;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;object-fit:cover;overflow:hidden}
+.nm{font-size:20px;font-weight:700}.sm{font-size:14px;color:#49454F}.star{color:#6750A4;font-size:18px}
+.bd{display:inline-flex;height:24px;padding:0 10px;border-radius:12px;font-size:12px;font-weight:700;align-items:center;margin:4px 6px 0 0}
+input,select,textarea{width:100%;border:1px solid #79747E;border-radius:20px;background:transparent;padding:14px 16px;font:inherit;color:inherit;margin:4px 0 12px}
+label{font-size:13px;color:#49454F;display:block}.two{display:flex;gap:8px;margin-top:10px}.two .btn{flex:1}
+.seg{display:flex;gap:4px;margin-bottom:14px}.seg button{height:44px;padding:0 20px;border:0;border-radius:12px;background:#E8DEF8;color:#1D192B;font-weight:500;font-size:15px;font-family:inherit}
+.seg button.on{background:#6750A4;color:#fff;border-radius:22px;font-weight:700}
+.rt button{border:0;background:none;color:#6750A4;font-size:32px;padding:4px}.hero{display:flex;gap:16px;align-items:center}.hero h2{margin:0}
+.bar{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;width:calc(100% - 32px);max-width:448px;height:72px;padding:8px;border-radius:36px;background:#ECE6F0;display:flex;gap:6px}
+.bar a{flex:1;display:flex;align-items:center;justify-content:center;border-radius:28px;font-weight:500}
+.bar a.on{background:#D0BCFF;color:#21005D;font-weight:700}.bar a.up{background:#6750A4;color:#fff;font-weight:700;flex:1.4}
+</style></head><body><div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+const sb=supabase.createClient('https://nbmfwnjqgqskpjeqefwn.supabase.co','sb_publishable_zmNNpavoNdi00BNoniEo3Q_GBXy6koc',{global:{fetch:(u,o={})=>fetch(u,{...o,headers:Object.fromEntries(new Headers(o.headers).entries())})}});
+const $=s=>document.querySelector(s),app=$('#app');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const BL=['56% 44% 60% 40%/48% 56% 44% 52%','50% 50% 36% 64%/56% 40% 60% 44%','30% 70% 70% 30%/30% 30% 70% 70%'],TN=['#E8DEF8','#D7F0CB','#FFD8E4'],IC=['#6750A4','#386A20','#7D5260'];
+const S={user:null,profile:null,admin:false,filter:'all',q:'',tab:'pending',rate:0};
+const safeUrl=u=>/^https?:\/\//i.test(u)?u:'';
+const ic=(a,i)=>{const u=safeUrl(a.icon_url||'');return u?`<img class="ic" alt="" src="${esc(u)}" style="border-radius:${BL[i%3]}">`:`<div class="ic" style="border-radius:${BL[i%3]};background:${IC[i%3]}">${esc((a.name||'?')[0])}</div>`};
+const bds=a=>(a.app_badges||[]).map(x=>x.badges).filter(Boolean).map(b=>`<span class="bd" style="background:${esc(b.bg)};color:${esc(b.fg)}">${esc(b.title)}</span>`).join('');
+const pub=p=>sb.storage.from('media').getPublicUrl(p).data.publicUrl;
+async function up(bucket,file,name){const p=`${S.user.id}/${Date.now()}-${name}`;const{error}=await sb.storage.from(bucket).upload(p,file);if(error)throw error;return p}
+function shell(h,on){app.innerHTML=`<div class="top"><a href="#/"><h1>You Store</h1></a>${S.user?`<a class="av" href="#/dev">${esc((S.profile?.name||S.user.email||'Я')[0].toUpperCase())}</a>`:`<button class="btn t" data-a="login">Войти</button>`}</div>${h}<nav class="bar"><a href="#/" class="${on=='c'?'on':''}">Каталог</a>${S.admin?`<a href="#/admin" class="${on=='a'?'on':''}">Админка</a>`:''}<a href="#/upload" class="up">+ Загрузить</a></nav>`}
+const loginBox=t=>`<p>${t}</p><button class="btn big" data-a="login">Войти через Google</button>`;
+const card=(a,i)=>`<a class="card" href="#/app/${esc(a.id)}" style="background:${TN[i%3]}">${ic(a,i)}<div style="flex:1"><div class="nm">${esc(a.name)}</div><div class="sm">${a.kind=='game'?'Игра':'Приложение'} · v${esc(a.version)}</div>${bds(a)}</div></a>`;
+async function pCat(){shell('<p>Загрузка…</p>','c');
+const{data,error}=await sb.from('apps').select('*,profiles(name),app_badges(badges(*))').eq('status','approved').order('created_at',{ascending:false});if(error)throw error;
+const q=S.q.toLowerCase(),L=(data||[]).filter(a=>(S.filter=='all'||a.kind==S.filter)&&a.name.toLowerCase().includes(q));
+shell(`<input id="q" placeholder="Поиск приложений и игр" value="${esc(S.q)}"><div class="seg">${[['all','Все'],['app','Приложения'],['game','Игры']].map(([k,t])=>`<button class="${S.filter==k?'on':''}" data-a="f" data-k="${k}">${t}</button>`).join('')}</div>${L.map(card).join('')||'<p class="sm">Пока ничего нет</p>'}`,'c')}
+async function pApp(id){const{data:a,error}=await sb.from('apps').select('*,profiles(name),app_badges(badges(*))').eq('id',id).single();if(error)throw error;
+const{data:rv}=await sb.from('reviews').select('*').eq('app_id',id).order('created_at',{ascending:false});S.rate=0;
+shell(`<div class="hero">${ic(a,1)}<div><h2>${esc(a.name)}</h2><div class="sm">${esc(a.profiles?.name||'')} · v${esc(a.version)}</div>${bds(a)}</div></div>${a.status!='approved'?'<p class="sm">Ожидает проверки</p>':''}<p>${esc(a.description)}</p><button class="btn big" data-a="dl" data-p="${esc(a.apk_path)}">Скачать APK</button><h2>Оставить отзыв</h2>${S.user?`<div class="rt" id="rt">${[1,2,3,4,5].map(n=>`<button data-a="st" data-n="${n}" aria-label="Оценка ${n}">☆</button>`).join('')}</div><label>Ваш отзыв<textarea id="rb" rows="3"></textarea></label><button class="btn" data-a="rv" data-id="${esc(a.id)}">Отправить отзыв</button>`:loginBox('Войдите через Google, чтобы оставить отзыв.')}<h2>Отзывы людей</h2>${(rv||[]).map(r=>`<div class="card" style="display:block;background:#E8DEF8"><b>${esc(r.author_name)}</b> <span class="sm">${new Date(r.created_at).toLocaleDateString('ru')}</span><div class="star">${'★'.repeat(r.rating)+'☆'.repeat(5-r.rating)}</div><div>${esc(r.body)}</div></div>`).join('')||'<p class="sm">Отзывов пока нет</p>'}`,'c')}
+async function pUp(){if(!S.user)return shell('<h2>Загрузить приложение</h2>'+loginBox('Скачивать можно без входа. Чтобы загружать приложения, войдите через Google и создайте аккаунт разработчика.'),'u');
+if(!S.profile)return shell('<h2>Загрузить приложение</h2><p>Сначала создайте аккаунт разработчика.</p><a class="btn big" style="display:flex;align-items:center;justify-content:center" href="#/dev">Создать аккаунт</a>','u');
+shell(`<h2>Загрузить приложение</h2><label>Название<input id="n"></label><label>Версия<input id="v" value="1.0"></label><label>Тип<select id="k"><option value="app">Приложение</option><option value="game">Игра</option></select></label><label>Описание<textarea id="d" rows="4"></textarea></label><label>APK-файл (до 50 МБ)<input id="apk" type="file" accept=".apk"></label><label>Иконка (картинка, до 5 МБ)<input id="ico" type="file" accept="image/*"></label><p class="sm">Новые приложения сначала проходят проверку.</p><button class="btn big" id="go" data-a="sub">Отправить на проверку</button>`,'u')}
+async function pDev(){if(!S.user)return shell('<h2>Аккаунт разработчика</h2>'+loginBox('Войдите через Google, чтобы создать аккаунт разработчика.'),'u');
+const p=S.profile||{},L=t=>(p.links||[]).find(l=>l.title==t)?.url||'';
+shell(`<h2>Аккаунт разработчика</h2><label>Фото профиля<input id="av" type="file" accept="image/*"></label><label>Имя разработчика<input id="dn" value="${esc(p.name)}"></label><label>О себе<textarea id="bio" rows="4">${esc(p.bio)}</textarea></label><label>Telegram<input id="l1" placeholder="https://t.me/…" value="${esc(L('Telegram'))}"></label><label>YouTube<input id="l2" placeholder="https://youtube.com/…" value="${esc(L('YouTube'))}"></label><label>GitHub<input id="l3" placeholder="https://github.com/…" value="${esc(L('GitHub'))}"></label><button class="btn big" data-a="sd">${S.profile?'Сохранить':'Создать аккаунт'}</button><div class="two"><button class="btn o" data-a="logout">Выйти</button></div>`,'u')}
+async function pAdm(){if(!S.admin)return shell('<p>Нет доступа</p>','a');let b='';
+if(S.tab=='pending'){const{data}=await sb.from('apps').select('*,profiles(name)').eq('status','pending').order('created_at');
+b=(data||[]).map(a=>`<div class="card" style="display:block;background:#F3EDF7"><b>${esc(a.name)}</b><div class="sm">${esc(a.profiles?.name)} · v${esc(a.version)} · ${Math.round((a.size_bytes||0)/1048576)} МБ</div><p>${esc(a.description)}</p><button class="btn t" data-a="dl" data-p="${esc(a.apk_path)}">Скачать APK для проверки</button><div class="two"><button class="btn" data-a="st2" data-id="${esc(a.id)}" data-s="approved">Одобрить</button><button class="btn o" data-a="st2" data-id="${esc(a.id)}" data-s="rejected">Отклонить</button></div></div>`).join('')||'<p class="sm">Очередь пуста</p>'}
+else{const[{data},{data:bs},{data:ab}]=await Promise.all([sb.from('apps').select('*,profiles(name)').eq('status','approved'),sb.from('badges').select('*'),sb.from('app_badges').select('*')]);
+b=(data||[]).map((a,i)=>`<div class="card" style="display:block;background:${TN[i%3]}"><b>${esc(a.name)}</b> <span class="sm">${esc(a.profiles?.name)}</span>${S.tab=='badges'?`<div>${(bs||[]).map(x=>{const on=(ab||[]).some(y=>y.app_id==a.id&&y.badge_id==x.id);return`<button class="bd" style="border:${on?'2px solid #1D1B20':'1px solid #79747E'};background:${on?esc(x.bg):'transparent'};color:${on?esc(x.fg):'#49454F'}" data-a="bg" data-app="${esc(a.id)}" data-b="${esc(x.id)}" data-on="${on?1:0}">${on?'✓ ':''}${esc(x.title)}</button>`}).join('')}</div>`:`<div class="two"><button class="btn o" data-a="st2" data-id="${esc(a.id)}" data-s="rejected">Снять</button></div>`}</div>`).join('')||'<p class="sm">Пусто</p>'}
+shell(`<h2>Админка</h2><div class="seg">${[['pending','На проверке'],['approved','Проверено'],['badges','Бейджи']].map(([k,t])=>`<button class="${S.tab==k?'on':''}" data-a="tab" data-k="${k}">${t}</button>`).join('')}</div>${b}`,'a')}
+const act={
+login:()=>sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}}),
+logout:async()=>{await sb.auth.signOut();location.hash='#/'},
+f:d=>{S.filter=d.k;route()},tab:d=>{S.tab=d.k;route()},
+st:d=>{S.rate=+d.n;document.querySelectorAll('#rt button').forEach((b,i)=>b.textContent=i<S.rate?'★':'☆')},
+dl:async d=>{const{data,error}=await sb.storage.from('apks').createSignedUrl(d.p,60,{download:true});if(error)return alert(error.message);location.href=data.signedUrl},
+rv:async d=>{if(!S.rate)return alert('Выберите оценку');const m=S.user.user_metadata||{};const{error}=await sb.from('reviews').upsert({app_id:d.id,user_id:S.user.id,author_name:m.full_name||S.profile?.name||'Пользователь',author_avatar:m.avatar_url||null,rating:S.rate,body:$('#rb').value.trim()},{onConflict:'app_id,user_id'});if(error)return alert(error.message);route()},
+sub:async()=>{const n=$('#n').value.trim(),f=$('#apk').files[0],i=$('#ico').files[0];if(!n||!f)return alert('Нужны название и APK');if(f.size>52428800)return alert('APK больше 50 МБ');
+$('#go').disabled=true;try{const path=await up('apks',f,'app.apk');const icon=i?pub(await up('media',i,'icon-'+i.name.replace(/[^\w.]/g,'_'))):null;
+const{error}=await sb.from('apps').insert({owner_id:S.user.id,name:n,version:$('#v').value||'1.0',kind:$('#k').value,description:$('#d').value,apk_path:path,icon_url:icon,size_bytes:f.size});if(error)throw error;alert('Отправлено на проверку');location.hash='#/'}catch(e){alert(e.message);$('#go').disabled=false}},
+sd:async()=>{const n=$('#dn').value.trim();if(!n)return alert('Введите имя');let av=S.profile?.avatar_url||null;const f=$('#av').files[0];
+if(f)av=pub(await up('media',f,'avatar-'+f.name.replace(/[^\w.]/g,'_')));
+const links=[['Telegram','#l1'],['YouTube','#l2'],['GitHub','#l3']].map(([t,s])=>({title:t,url:safeUrl($(s).value.trim())})).filter(l=>l.url);
+const{error}=await sb.from('profiles').upsert({id:S.user.id,name:n,bio:$('#bio').value,avatar_url:av,links});if(error)return alert(error.message);const wasNew=!S.profile;await load(wasNew?'#/upload':null)},
+st2:async d=>{const{error}=await sb.from('apps').update({status:d.s}).eq('id',d.id);if(error)return alert(error.message);route()},
+bg:async d=>{const t=sb.from('app_badges');const{error}=d.on=='1'?await t.delete().eq('app_id',d.app).eq('badge_id',d.b):await t.insert({app_id:d.app,badge_id:d.b});if(error)return alert(error.message);route()}};
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b)return;try{await act[b.dataset.a](b.dataset)}catch(x){alert(x.message)}});
+document.addEventListener('change',e=>{if(e.target.id=='q'){S.q=e.target.value;route()}});
+async function route(){const p=location.hash.split('/');const pg={app:pApp,upload:pUp,dev:pDev,admin:pAdm}[p[1]]||pCat;try{await pg(p[2])}catch(e){shell(`<p>Ошибка: ${esc(e.message)}</p>`,'c')}}
+async function load(go){const{data:{session}}=await sb.auth.getSession();S.user=session?.user||null;S.profile=null;S.admin=false;
+if(S.user){S.profile=(await sb.from('profiles').select('*').eq('id',S.user.id).maybeSingle()).data;S.admin=!!(await sb.rpc('is_admin')).data}
+if(go)location.hash=go;else route()}
+sb.auth.onAuthStateChange(e=>{if(e=='SIGNED_IN'||e=='SIGNED_OUT')setTimeout(()=>load(),0)});
+addEventListener('hashchange',route);load();
+</script></body></html>
