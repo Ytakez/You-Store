@@ -74,6 +74,17 @@ label{font-size:13px;color:var(--onv);display:block}
 .btn:hover{transform:translateY(-2px)}
 .fl{position:absolute;animation:fl 4.5s ease-in-out infinite alternate}.fl svg{animation:rot 16s linear infinite}
 .f1{top:34%;left:8%}.f2{top:46%;right:12%;animation-delay:-2s}.f3{top:62%;left:36%;animation-delay:-3.5s}
+.ph{text-align:center;margin:10px 0 18px}
+.pav{position:relative;display:block;width:176px;height:176px;margin:0 auto 14px;cursor:pointer}
+.pav img,.pav .pl{width:100%;height:100%;border-radius:50%;object-fit:cover;background:var(--pc);color:var(--opc);display:flex;align-items:center;justify-content:center;font-size:72px;font-weight:800;transition:border-radius .5s cubic-bezier(.34,1.56,.64,1)}
+.pav:hover img,.pav:hover .pl{border-radius:36%}
+.cam{position:absolute;right:2px;bottom:2px;width:48px;height:48px;border-radius:50%;background:var(--p);color:var(--onp);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;border:4px solid var(--bg)}
+.pn{font-size:30px;font-weight:800}
+.nk{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;color:var(--p);font-weight:500;margin-top:4px}
+.fld{position:relative;display:block;margin:20px 0}.fld>span{position:absolute;top:-9px;left:18px;background:var(--bg);padding:0 6px;font-size:12px;color:var(--onv);z-index:1}.fld input,.fld textarea{margin:0}
+.sec{color:var(--p);font-weight:500;font-size:14px;margin:26px 8px 10px}
+.row{display:flex;align-items:center;gap:16px;padding:16px 20px;background:var(--s2);border-radius:28px;margin-bottom:6px;width:100%;border:0;color:var(--on);font:inherit;text-align:left;cursor:pointer}
+.row .ri{width:48px;height:48px;flex:none;border-radius:50%;background:var(--sc);color:var(--osc);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700}
 #sn{position:fixed;left:50%;bottom:104px;transform:translate(-50%,20px);background:#E6E0E9;color:#322F35;padding:14px 20px;border-radius:16px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;max-width:calc(100% - 32px);z-index:9}
 #sn.show{opacity:1;transform:translate(-50%,0)}
 </style></head><body><div id="app"></div><div id="sn"></div>
@@ -123,58 +134,7 @@ shell(`<h2>Загрузить приложение</h2><label>APK-файл (до
 <label>Иконка (необязательно, до 5 МБ)<div class="file" data-a="pk" data-t="ico"><span class="fi">◐</span><span><b id="icot">Выбрать иконку</b><br><span class="sm" id="ics">Картинка</span></span></div></label><input id="ico" type="file" accept="image/*" hidden>
 <label>Название<input id="n"></label><label>Версия<input id="v" value="1.0"></label><label>Тип<select id="k"><option value="app">Приложение</option><option value="game">Игра</option></select></label><label>Описание<textarea id="d" rows="4"></textarea></label><p class="sm">Новые приложения сначала проходят проверку.</p><button class="btn big" id="go" data-a="sub">Отправить на проверку</button>`,'u')}
 async function pDev(){if(!S.user)return shell('<h2>Аккаунт разработчика</h2>'+loginBox('Войдите через Google, чтобы создать аккаунт разработчика.'),'u');
-const p=S.profile||{},L=t=>(p.links||[]).find(l=>l.title==t)?.url||'';
-shell(`<h2>${S.profile?'Профиль разработчика':'Создать аккаунт разработчика'}</h2>${S.profile?'<p class="sm">✓ Аккаунт разработчика создан. Здесь можно изменить данные.</p>':''}<p class="sm">Вы вошли как ${esc(S.user.email)}${S.admin?' · админ':''}</p><div>${pbd(S.profile)}</div><label>Фото профиля<input id="av" type="file" accept="image/*"></label><label>Имя разработчика<input id="dn" value="${esc(p.name)}"></label><label>О себе<textarea id="bio" rows="4">${esc(p.bio)}</textarea></label><label>Telegram<input id="l1" placeholder="https://t.me/…" value="${esc(L('Telegram'))}"></label><label>YouTube<input id="l2" placeholder="https://youtube.com/…" value="${esc(L('YouTube'))}"></label><label>GitHub<input id="l3" placeholder="https://github.com/…" value="${esc(L('GitHub'))}"></label><button class="btn big" data-a="sd">${S.profile?'Сохранить':'Создать аккаунт'}</button><div class="two"><button class="btn o" data-a="logout">Выйти</button></div>`,'u')}
+const p=S.profile||{},av=safeUrl(p.avatar_url||'');
+shell(`<div class="ph"><label class="pav" for="av">${av?`<img id="avp" src="${esc(av)}" alt="">`:`<div id="avp" class="pl">${esc((p.name||S.user.email||'Я')[0].toUpperCase())}</div>`}<span class="cam">+</span></label><input id="av" type="file" accept="image/*" hidden><div class="pn">${esc(p.name||'Новый разработчик')}</div>${S.profile?`<div class="nk">${p.nick?'@'+esc(p.nick)+' · ':''}мой профиль${pbd(S.profile)}</div>`:'<div class="sm">Создайте аккаунт разработчика</div>'}</div><label class="fld"><span>Имя</span><input id="dn" value="${esc(p.name)}"></label><label class="fld"><span>Ник</span><input id="nk" value="${esc(p.nick)}" placeholder="Ytakez"></label><label class="fld"><span>О себе</span><textarea id="bio" rows="3">${esc(p.bio)}</textarea></label><button class="btn big" data-a="sd">${S.profile?'Сохранить':'Создать аккаунт'}</button><div class="sec">Способы входа</div><div class="row"><span class="ri">G</span><span><b>Google</b><br><span class="sm">${esc(S.user.email)}</span></span></div><div class="sec">Приложения</div><a class="row" href="#/upload"><span class="ri">▦</span><span><b>Мои приложения</b><br><span class="sm">опубликовать своё приложение</span></span></a>${S.admin?'<a class="row" href="#/admin"><span class="ri">★</span><span><b>Админка</b><br><span class="sm">проверка, бейджи, люди</span></span></a>':''}<button class="row" data-a="logout"><span class="ri">↪</span><b>Выйти</b></button>`,'u')}
 async function pAdm(){if(!S.admin)return shell('<p>Нет доступа</p>','a');let b='';const T=S.tab,X=a=>`data-id="${esc(a.id)}" data-p="${esc(a.apk_path)}" data-i="${esc(a.icon_url||'')}"`;
-if(T=='pending'){const{data}=await sb.from('apps').select('*,profiles(name)').eq('status','pending').order('created_at');
-b=(data||[]).map(a=>`<div class="card col" style="background:var(--s2)"><b>${esc(a.name)}</b><div class="sm">${esc(a.profiles?.name)} · v${esc(a.version)} · ${Math.round((a.size_bytes||0)/1048576)} МБ</div><p>${esc(a.description)}</p><button class="btn t" data-a="dl" data-p="${esc(a.apk_path)}">Скачать APK для проверки</button><div class="two"><button class="btn" data-a="st2" data-id="${esc(a.id)}" data-s="approved">Одобрить</button><button class="btn o" data-a="st2" data-id="${esc(a.id)}" data-s="rejected">Отклонить</button></div><div class="two"><button class="btn dng" data-a="del" ${X(a)}>Удалить</button></div></div>`).join('')||'<p class="sm">Очередь пуста</p>'}
-else if(T=='people'){const[{data:ps},{data:bs}]=await Promise.all([sb.from('profiles').select('id,name,profile_badges(badge_id)'),sb.from('badges').select('*').order('title')]);
-b=(ps||[]).map(p=>`<div class="card col" style="background:var(--s2)"><b>${esc(p.name)}</b><div>${(bs||[]).map(x=>{const on=(p.profile_badges||[]).some(y=>y.badge_id==x.id);return`<button class="chip tg ${on?'on':''}" data-a="pb" data-p="${esc(p.id)}" data-b="${esc(x.id)}" data-on="${on?1:0}">${shape(x.shape,x.bg,16)}${esc(x.title)}</button>`}).join('')}</div></div>`).join('')||'<p class="sm">Людей пока нет</p>'}
-else if(T=='badges'){const[{data:ap},{data:bs},{data:ab}]=await Promise.all([sb.from('apps').select('id,name').eq('status','approved'),sb.from('badges').select('*').order('title'),sb.from('app_badges').select('*')]);
-b=`<div class="card col" style="background:var(--s2)"><b>Новый бейдж</b><label>Что он означает<input id="bt" placeholder="Например: Проверено"></label><label>Цвет фигуры<input id="bc" type="color" value="${esc(S.nb.color)}" style="height:48px;padding:4px"></label><label>Фигура</label><div class="shp">${KS.map(k=>`<button class="shb ${S.nb.shape==k?'on':''}" data-a="shp" data-k="${k}" aria-label="${k}">${shape(k,'#E6E0E9',28)}</button>`).join('')}</div><button class="btn big" style="height:52px" data-a="nb">Создать бейдж</button></div><h2>Все бейджи</h2><div>${(bs||[]).map(x=>`<span class="chip">${shape(x.shape,x.bg,16)}${esc(x.title)}<button class="x" data-a="bdel" data-b="${esc(x.id)}" aria-label="Удалить бейдж">×</button></span>`).join('')}</div><h2>Бейджи приложений</h2>${(ap||[]).map((a,i)=>`<div class="card col" style="background:var(--c${i%3})"><b>${esc(a.name)}</b><div>${(bs||[]).map(x=>{const on=(ab||[]).some(y=>y.app_id==a.id&&y.badge_id==x.id);return`<button class="chip tg ${on?'on':''}" data-a="bg" data-app="${esc(a.id)}" data-b="${esc(x.id)}" data-on="${on?1:0}">${shape(x.shape,x.bg,16)}${esc(x.title)}</button>`}).join('')}</div></div>`).join('')}`}
-else{const{data}=await sb.from('apps').select('*,profiles(name)').eq('status','approved');
-b=(data||[]).map((a,i)=>`<div class="card col" style="background:var(--c${i%3})"><b>${esc(a.name)}</b> <span class="sm">${esc(a.profiles?.name)}</span><div class="two"><button class="btn o" data-a="st2" data-id="${esc(a.id)}" data-s="rejected">Снять</button><button class="btn dng" data-a="del" ${X(a)}>Удалить</button></div></div>`).join('')||'<p class="sm">Магазин пуст</p>'}
-shell(`<h2>Админка</h2><div class="seg">${[['pending','Проверка'],['approved','Магазин'],['badges','Бейджи'],['people','Люди']].map(([k,t])=>`<button class="${S.tab==k?'on':''}" data-a="tab" data-k="${k}">${t}</button>`).join('')}</div>${b}`,'a')}
-const act={
-del:async d=>{if(!await ask('Удалить приложение навсегда?'))return;const{data,error}=await sb.from('apps').delete().eq('id',d.id).select();if(!data?.length)return toast(error?.message||'Нет прав на удаление');
-await sb.storage.from('apks').remove([d.p]);if(d.i){const m=d.i.split('/media/')[1];if(m)await sb.storage.from('media').remove([decodeURIComponent(m)])}
-toast('Приложение удалено');if(location.hash.startsWith('#/app'))location.hash='#/';else route()},
-nb:async()=>{const t=$('#bt').value.trim();if(!t)return toast('Напишите, что означает бейдж');const{error}=await sb.from('badges').insert({id:'b'+Date.now(),title:t,bg:$('#bc').value,fg:'#1D192B',shape:S.nb.shape});if(error)return toast(error.message);S.nb.color=$('#bc').value;toast('Бейдж создан');route()},
-shp:d=>{S.nb.shape=d.k;document.querySelectorAll('.shb').forEach(b=>b.classList.toggle('on',b.dataset.k==d.k))},
-bdel:async d=>{if(!await ask('Удалить бейдж у всех?'))return;const{error}=await sb.from('badges').delete().eq('id',d.b);if(error)return toast(error.message);route()},
-pb:async d=>{const t=sb.from('profile_badges');const{error}=d.on=='1'?await t.delete().eq('profile_id',d.p).eq('badge_id',d.b):await t.insert({profile_id:d.p,badge_id:d.b});if(error)return toast(error.message);route()},
-login:()=>sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}}),
-logout:async()=>{await sb.auth.signOut();location.hash='#/'},
-f:d=>{S.filter=d.k;route()},tab:d=>{S.tab=d.k;route()},
-pk:d=>$(d.t=='apk'?'#apk':'#ico').click(),
-st:d=>{S.rate=+d.n;document.querySelectorAll('#rt button').forEach((b,i)=>b.textContent=i<S.rate?'★':'☆')},
-dl:async d=>{const{data,error}=await sb.storage.from('apks').createSignedUrl(d.p,60,{download:true});if(error)return toast(error.message);location.href=data.signedUrl},
-rv:async d=>{if(!S.rate)return toast('Выберите оценку');const m=S.user.user_metadata||{};const{error}=await sb.from('reviews').upsert({app_id:d.id,user_id:S.user.id,author_name:m.full_name||S.profile?.name||'Пользователь',author_avatar:m.avatar_url||null,rating:S.rate,body:$('#rb').value.trim()},{onConflict:'app_id,user_id'});if(error)return toast(error.message);route()},
-sub:async()=>{const n=$('#n').value.trim();if(!S.apk)return toast('Сначала выберите APK-файл');if(!n)return toast('Введите название');
-$('#go').disabled=true;try{const{error}=await sb.from('apps').insert({owner_id:S.user.id,name:n,version:$('#v').value||'1.0',kind:$('#k').value,description:$('#d').value,apk_path:S.apk.path,icon_url:S.icon,size_bytes:S.apk.size});if(error)throw error;toast('Отправлено на проверку');location.hash='#/'}catch(e){toast(e.message);$('#go').disabled=false}},
-sd:async()=>{const n=$('#dn').value.trim();if(!n)return toast('Введите имя');let av=S.profile?.avatar_url||null;const f=$('#av').files[0];
-if(f)av=pub(await up('media',f,'avatar-'+f.name.replace(/[^\w.]/g,'_')));
-const links=[['Telegram','#l1'],['YouTube','#l2'],['GitHub','#l3']].map(([t,s])=>({title:t,url:safeUrl($(s).value.trim())})).filter(l=>l.url);
-const{error}=await sb.from('profiles').upsert({id:S.user.id,name:n,bio:$('#bio').value,avatar_url:av,links});if(error)return toast(error.message);const wasNew=!S.profile;await load('#/');toast(wasNew?'Аккаунт создан':'Сохранено')},
-st2:async d=>{const{error}=await sb.from('apps').update({status:d.s}).eq('id',d.id);if(error)return toast(error.message);route()},
-bg:async d=>{const t=sb.from('app_badges');const{error}=d.on=='1'?await t.delete().eq('app_id',d.app).eq('badge_id',d.b):await t.insert({app_id:d.app,badge_id:d.b});if(error)return toast(error.message);route()}};
-document.addEventListener('click',async e=>{const b=e.target.closest('[data-a]');if(!b)return;try{await act[b.dataset.a](b.dataset)}catch(x){toast(x.message)}});
-document.addEventListener('change',async e=>{const t=e.target;
-if(t.id=='q'){S.q=t.value;route()}
-else if(t.id=='apk'){const f=t.files[0];if(!f)return;if(f.size>52428800){toast('APK больше 50 МБ');return}
-if(!$('#n').value)$('#n').value=f.name.replace(/\.apk$/i,'').replace(/[_-]+/g,' ');
-$('#apkt').textContent=f.name;$('#aps').innerHTML=spin(22)+' Загрузка…';$('#go').disabled=true;S.apk=null;
-try{S.apk={path:await up('apks',f,'app.apk'),size:f.size};$('#aps').textContent='✓ Загружено · '+(f.size/1048576).toFixed(1)+' МБ'}catch(x){$('#aps').textContent='Ошибка: '+x.message}
-$('#go').disabled=false}
-else if(t.id=='ico'){const f=t.files[0];if(!f)return;$('#icot').textContent=f.name;$('#ics').innerHTML=spin(22)+' Загрузка…';$('#go').disabled=true;S.icon=null;
-try{S.icon=pub(await up('media',f,'icon-'+f.name.replace(/[^\w.]/g,'_')));$('#ics').textContent='✓ Загружено'}catch(x){$('#ics').textContent='Ошибка: '+x.message}
-$('#go').disabled=false}});
-async function pLogin(){if(S.user){location.hash='#/';return}
-app.innerHTML=`<div class="lg"><div class="fl f1">${shape('cookie','#D0BCFF',150)}</div><div class="fl f2">${shape('star','#EFB8C8',96)}</div><div class="fl f3">${shape('flower','#9BD58A',120)}</div><div class="wl">Добро пожаловать<br>в You Store</div><button class="btn big" data-a="login">Войти через Google</button></div>`}
-async function route(){const p=location.hash.split('/');const pg={app:pApp,upload:pUp,dev:pDev,admin:pAdm,login:pLogin}[p[1]]||pCat;try{await pg(p[2])}catch(e){shell(`<p>Ошибка: ${esc(e.message)}</p>`,'c')}}
-async function load(go){const{data:{session}}=await sb.auth.getSession();S.user=session?.user||null;S.profile=null;S.admin=false;
-if(S.user){S.profile=(await sb.from('profiles').select('*,profile_badges(badges(*))').eq('id',S.user.id).maybeSingle()).data;const r=await sb.rpc('is_admin');S.admin=r.data===true;if(r.error)toast('Проверка админа: '+r.error.message)}
-if(go&&location.hash!==go)location.hash=go;else route()}
-sb.auth.onAuthStateChange((e,s)=>{if((e=='SIGNED_IN'||e=='SIGNED_OUT')&&(s?.user?.id||null)!==(S.user?.id||null))setTimeout(()=>load(),0)});
-addEventListener('hashchange',route);load();
-</script></body></html>
+if(T=='pending'){const{data}=await sb.from('apps').select('*,profiles(name
